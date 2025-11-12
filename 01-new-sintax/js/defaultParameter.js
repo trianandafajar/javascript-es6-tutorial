@@ -1,29 +1,31 @@
-function say(maeeage) {
-  console.log(maeeage);
+// Function without default parameter
+function say(message) {
+  console.log(message);
 }
+say(); // Output: undefined
 
-say();
-
+// Function with manual default parameter check (pre-ES6 style)
 function say2(message) {
   message = typeof message !== "undefined" ? message : "Hello";
   console.log(message);
 }
+say2(); // Output: Hello
 
-say2();
-
+// Function using ES6 default parameters
 function say3(message = "Hello") {
   console.log(message);
 }
-say3();
-say3("hello 2");
-say3(undefined);
+say3(); // Output: Hello
+say3("hello 2"); // Output: hello 2
+say3(undefined); // Output: Hello
 
+// Function with multiple default parameters
 function createDiv(
   height = "100px",
   width = "100px",
   border = "1px solid red"
 ) {
-  let div = document.createElement("div");
+  const div = document.createElement("div");
   div.style.height = height;
   div.style.width = width;
   div.style.border = border;
@@ -34,19 +36,22 @@ function createDiv(
 console.log(createDiv());
 console.log(createDiv(undefined, undefined, "5px solid blue"));
 
+// Function using a default array parameter
 function put(toy, toyBox = []) {
   toyBox.push(toy);
   return toyBox;
 }
-console.log(put("Toy Car"));
-console.log(put("Toy Bike"));
+console.log(put("Toy Car")); // ["Toy Car"]
+console.log(put("Toy Bike")); // ["Toy Bike"]
 
-function requereArg() {
+// Function throwing an error when argument is missing
+function requireArg() {
   throw new Error("No arguments");
 }
 
-function add(x = requereArg(), y = requereArg()) {
+// Using a function call as a default value
+function add(x = requireArg(), y = requireArg()) {
   return x + y;
 }
-console.log(add(1, 2));
-console.log(add(1));
+console.log(add(1, 2)); // Output: 3
+console.log(add(1)); // Throws Error: No arguments
