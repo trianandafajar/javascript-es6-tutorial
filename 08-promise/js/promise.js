@@ -1,7 +1,8 @@
-// untuk memahami promise kita mulai dengan sebuah contoh
-// kita akan melakukan pencarian data dari kumpilan objek
+// Understanding Promises in JavaScript
+// Example: Searching for user data from a list of objects
 
-function getUser() {
+// --- Example 1: Synchronous function ---
+function getUsers() {
   return [
     { userName: "john", email: "johndoe@me.com" },
     { userName: "jane", email: "janedoe@me.com" },
@@ -10,14 +11,15 @@ function getUser() {
 }
 
 function findUser(userName) {
-  const users = getUser();
-  const user = users.find((user) => user.userName === userName);
-  return user;
+  const users = getUsers();
+  return users.find((user) => user.userName === userName);
 }
 
-console.log(findUser("bob"));
+console.log(findUser("bob")); // Works fine (synchronous)
 
-function getUser2() {
+
+// --- Example 2: Asynchronous issue (without handling) ---
+function getUsersAsyncBroken() {
   let users = [];
   setTimeout(() => {
     users = [
@@ -26,19 +28,19 @@ function getUser2() {
       { userName: "bob", email: "bobdoe@me.com" },
     ];
   }, 1000);
-  return users;
+  return users; // Returns empty array before setTimeout runs
 }
 
-function findUser2(userName) {
-  const users = getUser2();
-  const user = users.find((user) => user.userName === userName);
-  return user;
+function findUserBroken(userName) {
+  const users = getUsersAsyncBroken();
+  return users.find((user) => user.userName === userName);
 }
 
-console.log(findUser2("bob"));
+console.log(findUserBroken("bob")); // ❌ undefined (async problem)
 
-// atasi dengan callback ES5
-function getUser3(callback) {
+
+// --- Example 3: Using Callbacks (ES5 style) ---
+function getUsersWithCallback(callback) {
   setTimeout(() => {
     callback([
       { userName: "john", email: "johndoe@me.com" },
@@ -48,44 +50,57 @@ function getUser3(callback) {
   }, 1000);
 }
 
-function findUser3(userName, callback) {
-  getUser3((users) => {
+function findUserWithCallback(userName, callback) {
+  getUsersWithCallback((users) => {
     const user = users.find((user) => user.userName === userName);
     callback(user);
   });
 }
 
-findUser3("bob", (user) => console.log(user));
+findUserWithCallback("bob", (user) => console.log(user)); // ✅ Works
 
-// atasi dengan Promise ES6
-let sucess = true;
 
-function getUser4() {
+// --- Example 4: Using Promises (ES6 style) ---
+let success = true;
+
+function getUsersPromise() {
   return new Promise((resolve, reject) => {
-    // throw new Error("Field not found");
     setTimeout(() => {
-      if (sucess) {
+      if (success) {
         resolve([
           { userName: "john", email: "johndoe@me.com" },
           { userName: "jane", email: "janedoe@me.com" },
           { userName: "bob", email: "bobdoe@me.com" },
         ]);
       } else {
-        reject("Request failed");
+        reject("❌ Request failed");
       }
     }, 1000);
   });
 }
 
-function onFullField(users) {
+function onResolve(users) {
   const user = users.find((user) => user.userName === "bob");
   console.log(user);
 }
 
 function onReject(error) {
-  console.log(error);
+  console.error(error);
 }
 
-const promise = getUser4();
-promise.then(onFullField, onReject);
-promise.catch(onReject);
+// Traditional Promise handling
+getUsersPromise().then(onResolve).catch(onReject);
+
+
+// --- Example 5: Using async/await (modern style) ---
+async function findUserAsync(userName) {
+  try {
+    const users = await getUsersPromise();
+    const user = users.find((u) => u.userName === userName);
+    console.log(user);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+findUserAsync("bob"); // ✅ Works with clean async/await syntax
