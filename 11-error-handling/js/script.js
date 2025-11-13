@@ -1,11 +1,10 @@
-// conoth normal error
-
+// Example 1: Normal error (synchronous validation)
 function getUserById(id) {
-  if (typeof is !== "number" || id <= 0) {
-    throw new Error("invalid id argument");
+  if (typeof id !== "number" || id <= 0) {
+    throw new Error("Invalid 'id' argument");
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     resolve({
       id,
       username: "admin",
@@ -13,26 +12,22 @@ function getUserById(id) {
   });
 }
 
-// getUserById("a")
-//   .then((user) => console.log(user.username))
-//   .catch((err) => console.log(err));
-
 try {
   getUserById("a")
     .then((user) => console.log(user.username))
-    .catch((err) => console.log(`Corror .catch : ${err}`));
+    .catch((err) => console.log(`Caught by .catch: ${err}`));
 } catch (error) {
-  console.log(`Error by try/catch : ${error}`);
+  console.log(`Caught by try/catch: ${error}`);
 }
 
-// 2 keslahan dalam Promise
 
+// Example 2: Error thrown inside Promise executor
 let authorized = false;
 
 function getUserById2(id) {
   return new Promise((resolve, reject) => {
     if (!authorized) {
-      throw new Error("Unauthorized");
+      throw new Error("Unauthorized access");
     }
 
     resolve({
@@ -45,16 +40,18 @@ function getUserById2(id) {
 try {
   getUserById2(10)
     .then((user) => console.log(user.username))
-    .catch((err) => console.log(`Corror .catch : ${err}`));
+    .catch((err) => console.log(`Caught by .catch: ${err}`));
 } catch (error) {
-  console.log(`Error by try/catch : ${error}`);
+  console.log(`Caught by try/catch: ${error}`);
 }
 
-// 3 memanggil fungsi rejct
+
+// Example 3: Properly rejecting inside Promise
 function getUserById3(id) {
   return new Promise((resolve, reject) => {
     if (!authorized) {
-      reject("Reject Unauthorized");
+      reject("Rejected: Unauthorized access");
+      return;
     }
 
     resolve({
@@ -67,17 +64,18 @@ function getUserById3(id) {
 try {
   getUserById3(10)
     .then((user) => console.log(user.username))
-    .catch((err) => console.log(`Corror .catch : ${err}`));
+    .catch((err) => console.log(`Caught by .catch: ${err}`));
 } catch (error) {
-  console.log(`Error by try/catch : ${error}`);
+  console.log(`Caught by try/catch: ${error}`);
 }
 
-// 4 tidak ada method catch
 
+// Example 4: Missing .catch() — unhandled rejection
 function getUserById4(id) {
   return new Promise((resolve, reject) => {
     if (!authorized) {
-      reject("Reject 4 Unauthorized");
+      reject("Rejected: Unauthorized (no .catch())");
+      return;
     }
 
     resolve({
@@ -89,7 +87,7 @@ function getUserById4(id) {
 
 try {
   getUserById4(10).then((user) => console.log(user.username));
-  console.log("next process ....");
+  console.log("Next process...");
 } catch (error) {
-  console.log(`Error by try/catch : ${error}`);
+  console.log(`Caught by try/catch: ${error}`);
 }
