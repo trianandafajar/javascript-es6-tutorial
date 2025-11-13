@@ -1,7 +1,12 @@
+let authorized = false;
+
 function getUserById2(id) {
   return new Promise((resolve, reject) => {
     if (!authorized) {
-      throw new Error("Unauthorized");
+      // Throwing inside Promise executor won't be caught by try/catch outside
+      // So we should use reject() instead of throw
+      reject("Unauthorized access");
+      return;
     }
 
     resolve({
@@ -14,7 +19,7 @@ function getUserById2(id) {
 try {
   getUserById2(10)
     .then((user) => console.log(user.username))
-    .catch((err) => console.log(`Corror .catch : ${err}`));
+    .catch((err) => console.log(`Caught by .catch: ${err}`));
 } catch (error) {
-  console.log(`Error by try/catch : ${error}`);
+  console.log(`Caught by try/catch: ${error}`);
 }
