@@ -1,21 +1,23 @@
-const p1 = new Promise((resolve, reject) => {
+// Example: Promise.race() — returns the result of the fastest promise
+
+const p1 = new Promise((resolve) => {
   setTimeout(() => {
-    console.log("The first promise is resolved");
+    console.log("✅ The first promise resolved");
     resolve(10);
-  }, 1 * 1000);
+  }, 1000);
 });
 
-const p2 = new Promise((resolve, reject) => {
+const p2 = new Promise((resolve) => {
   setTimeout(() => {
-    console.log("The second promise is resolved");
+    console.log("✅ The second promise resolved");
     resolve(20);
-  }, 2 * 1000);
+  }, 2000);
 });
 
 Promise.race([p1, p2])
   .then((result) => {
-    console.log(`REsult : ${result}`);
+    console.log(`🏁 Fastest result: ${result}`);
   })
   .catch((error) => {
-    console.log(`Error : ${error}`);
+    console.error(`❌ Error: ${error}`);
   });
