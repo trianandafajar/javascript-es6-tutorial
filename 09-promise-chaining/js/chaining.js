@@ -1,11 +1,12 @@
-// Promise chaining
-// terkadang kita ingin membuat oprasi dari hasil process sebelumnya
-// contoh
+// PROMISE CHAINING
+// Promise chaining allows sequential execution where the output of one operation
+// becomes the input of the next.
 
-let p = new Promise((resolve, reject) => {
+// Basic example of promise chaining
+let p = new Promise((resolve) => {
   setTimeout(() => {
     resolve(10);
-  }, 3 * 100);
+  }, 300);
 });
 
 p.then((result) => {
@@ -21,11 +22,12 @@ p.then((result) => {
     return result * 4;
   });
 
-// Conoth penanganan banyak promise
-let p2 = new Promise((resolve, reject) => {
+
+// Example of multiple .then() calls on the same Promise
+let p2 = new Promise((resolve) => {
   setTimeout(() => {
     resolve(10);
-  }, 3 * 100);
+  }, 300);
 });
 
 p2.then((result) => {
@@ -43,57 +45,77 @@ p2.then((result) => {
   return result * 4;
 });
 
-// chaining yang mengembalikan promise
-let p3 = new Promise((resolve, reject) => {
+// Notice that each `.then()` above executes independently — not sequentially.
+
+
+// Example: chaining with Promises returned inside `.then()`
+let p3 = new Promise((resolve) => {
   setTimeout(() => {
     resolve(10);
-  }, 3 * 100);
+  }, 300);
 });
 
 p3.then((result) => {
   console.log(result);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(result * 2);
-    }, 3 * 100);
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(result * 2), 300);
   });
 })
   .then((result) => {
     console.log(result);
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(result * 3);
-      }, 3 * 100);
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(result * 3), 300);
     });
   })
   .then((result) => console.log(result));
 
-// Contoh jika ingin membuat oprasi asinkron secara berurutan
+
+// Example: Sequential asynchronous operations using Promise chaining
 function getUser(userId) {
-  return new Promise((resolve, reject) => {
-    console.log(" get data from database");
+  return new Promise((resolve) => {
+    console.log("Fetching user from database...");
     setTimeout(() => {
-      resolve({ userId: userId, userName: "admin" });
+      resolve({ userId, userName: "admin" });
     }, 1000);
   });
 }
 
 function getService(user) {
-  return new Promise((resolve, reject) => {
-    console.log(`Get the service of ${user.userName} from API`);
+  return new Promise((resolve) => {
+    console.log(`Fetching services for ${user.userName} from API...`);
     setTimeout(() => {
       resolve(["Email", "VPN", "CDN"]);
-    }, 3 * 1000);
+    }, 3000);
   });
 }
 
-function getServiceCost(service) {
-  return new Promise((resolve, reject) => {
-    console.log(`Calculate the service cost of ${service}`);
+function getServiceCost(services) {
+  return new Promise((resolve) => {
+    console.log(`Calculating service cost for ${services.join(", ")}`);
     setTimeout(() => {
-      resolve(service.length * 100);
-    }, 2 * 1000);
+      resolve(services.length * 100);
+    }, 2000);
   });
 }
 
-getUser(100).then(getService).then(getServiceCost).then(console.log);
+// Promise chaining
+getUser(100)
+  .then(getService)
+  .then(getServiceCost)
+  .then((cost) => console.log("Total service cost:", cost))
+  .catch((error) => console.error("Error:", error));
+
+
+// --- Modern Version Using async/await ---
+async function runAsyncFlow() {
+  try {
+    const user = await getUser(100);
+    const services = await getService(user);
+    const cost = await getServiceCost(services);
+    console.log("Total service cost (async/await):", cost);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+runAsyncFlow();
