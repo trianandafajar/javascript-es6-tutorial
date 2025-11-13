@@ -1,37 +1,47 @@
-// Symbol es6
-// symbol menciptakan nilai unik setiap dibuat
-// conoth membuat symbol
+// ==========================================================
+// 🧩 SYMBOL IN ES6
+// ==========================================================
+
+// Symbols create unique values every time they are instantiated.
 let s = Symbol("foo");
 
-console.log(Symbol() === Symbol());
+// Each Symbol is guaranteed to be unique.
+console.log(Symbol() === Symbol()); // false
 
-// sumbol menerima deskripsi walaupun sebagai argumen optional.
+// Symbols can optionally take a description (for debugging).
+let firstName = Symbol("firstName");
+let lastName = Symbol("lastName");
 
-let firstName = Symbol("firstName"),
-  lastName = Symbol("lastName");
 console.log(firstName, lastName);
+console.log(typeof firstName); // "symbol"
 
-console.log(typeof firstName);
+// Symbols are primitive values; using `new` with Symbol will throw an error.
+// let s2 = new Symbol(); // ❌ TypeError
 
-// symbol adalah nilai primitif jdi jika menggunakan new akan error
-// let s2 = new Symbol();
 
-// BERBAGI Symbol
-// BERBAGI SYMBOL KITA BISA MENGGUNAKAN FOR
+// ==========================================================
+// 🔁 SHARED SYMBOLS USING Symbol.for()
+// ==========================================================
+
+// Symbol.for() checks a global symbol registry.
+// If the symbol exists, it reuses it; otherwise, it creates a new one.
 let ssn = Symbol.for("ssn");
 let citizenId = Symbol.for("ssn");
-console.log(ssn === citizenId);
 
-// untuk mendapatkan kunci yang terkait dengan suatu symbol gunakan keyFor
-console.log(Symbol.keyFor(ssn));
+console.log(ssn === citizenId); // true
 
-// jika symbol tidak ada dalam registry maka akan mengembalikan undefined
+// Retrieve the key associated with a registered symbol.
+console.log(Symbol.keyFor(ssn)); // "ssn"
 
-// console.log(Symbol.keyFor(systemId));
+// If a symbol is not registered globally, Symbol.keyFor() returns undefined.
+// console.log(Symbol.keyFor(systemId)); // undefined
 
-// PENGGUNAAN SYMBOL
-// 1. menggunakan symbol sebagai nilai unik
 
+// ==========================================================
+// 🧱 USING SYMBOLS
+// ==========================================================
+
+// 1️⃣ Using Symbol for unique constant values
 let statuses = {
   OPEN: Symbol("open"),
   IN_PROGRESS: Symbol("in progress"),
@@ -48,41 +58,54 @@ let task = {
 
 task.setStatus(statuses.OPEN);
 
-// menggunakan symbol sebagai nama property
+
+// 2️⃣ Using Symbol as an object property key
 let status = Symbol("status");
+
 task = {
   [status]: statuses.OPEN,
   description: "Learn ES6 Symbols",
 };
-console.log(task);
 
-// symbol iterator
-var numbers = [1, 2, 3];
-// untuk mengurainya kita bisa menggunakan for of
+console.log(task);
+console.log(task[status]); // Access via Symbol key
+
+
+// ==========================================================
+// 🔄 SYMBOL.iterator EXAMPLE
+// ==========================================================
+
+// Regular array iteration with for...of uses the internal Symbol.iterator
+const numbers = [1, 2, 3];
 for (let num of numbers) {
   console.log(num);
 }
 
-// secara internal sebenarnya javascript terlebih dahulu memanggil Symbol.iterator
-
-var iterator = numbers[Symbol.iterator]();
+// Internally, JavaScript retrieves the iterator using Symbol.iterator
+const iterator = numbers[Symbol.iterator]();
 
 console.log(iterator.next());
 console.log(iterator.next());
 console.log(iterator.next());
-console.log(iterator.next());
+console.log(iterator.next()); // done: true
 
-// Secara default, koleksi tidak dapat diubah. Namun, Anda dapat membuatnya dapat diubah dengan menggunakan seperti Symbol.iterator
 
+// ==========================================================
+// 🧰 CUSTOM ITERATOR USING Symbol.iterator
+// ==========================================================
+
+// By implementing Symbol.iterator, you can make your own iterable class.
 class List {
   constructor() {
     this.elements = [];
   }
+
   add(element) {
     this.elements.push(element);
-    return this;
+    return this; // allow method chaining
   }
 
+  // Define a generator method using Symbol.iterator
   *[Symbol.iterator]() {
     for (let element of this.elements) {
       yield element;
@@ -90,41 +113,37 @@ class List {
   }
 }
 
-let cars = new List();
+const cars = new List();
 cars.add("BMW").add("Mercedes").add("Audi");
 
 for (let c of cars) {
   console.log(c);
 }
 
-// Metode Symbol.toPrimitive menentukan apa yang harus terjadi ketika suatu objek diubah menjadi nilai primitif.
-function Money(amount, currency) {
-  this.amount = amount;
-  this.currency = currency;
-}
 
+// ==========================================================
+// 💱 Symbol.toPrimitive EXAMPLE
+// ==========================================================
+
+// Symbol.toPrimitive controls how an object converts to a primitive value.
 function Money(amount, currency) {
   this.amount = amount;
   this.currency = currency;
 }
 
 Money.prototype[Symbol.toPrimitive] = function (hint) {
-  var result;
   switch (hint) {
     case "string":
-      result = this.amount + this.currency;
-      break;
+      return `${this.amount}${this.currency}`;
     case "number":
-      result = this.amount;
-      break;
+      return this.amount;
     default:
-      result = this.amount + this.currency;
-      break;
+      return `${this.amount} ${this.currency}`;
   }
-  return result;
 };
 
-var price = new Money(100, "USD");
-console.log("Price is: " + price);
-console.log(+price + 1);
-console.log(String(price));
+const price = new Money(100, "USD");
+
+console.log("Price is: " + price); // "Price is: 100USD"
+console.log(+price + 1);           // 101
+console.log(String(price));        // "100USD"
