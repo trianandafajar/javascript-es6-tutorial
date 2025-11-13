@@ -1,27 +1,36 @@
-// 1. EVENT HANDLER
+// ==============================
+// 1️⃣ EVENT HANDLER
+// ==============================
 
 const greeting = document.querySelector("#greeting");
 const username = document.querySelector("#username");
 
-// username.addEventListener("keyup", () => {
-//   greeting.textContent = `Hello ${this.value}`;
-// });
+// ❌ Arrow function tidak punya `this` sendiri,
+// jadi `this.value` di sini akan undefined.
+username.addEventListener("keyup", () => {
+  greeting.textContent = `Hello ${username.value}`;
+});
 
+// ✅ Gunakan function biasa agar `this` mengacu ke elemen input
 username.addEventListener("keyup", function () {
   greeting.textContent = `Hello ${this.value}`;
 });
 
-// 2. Objek Method
 
-// const counter = {
-//   count: 0,
-//   next: () => ++this.count,
-//   current: () => this.count,
-// };
+// ==============================
+// 2️⃣ OBJECT METHOD
+// ==============================
 
-// console.log(counter.current());
-// console.log(counter.next());
+// ❌ Arrow function tidak cocok untuk object method karena `this` mengacu ke global scope
+/*
+const counter = {
+  count: 0,
+  next: () => ++this.count,     // ❌ this bukan milik counter
+  current: () => this.count,
+};
+*/
 
+// ✅ Gunakan method biasa agar `this` mengacu ke objek itu sendiri
 const counter = {
   count: 0,
   next() {
@@ -32,10 +41,13 @@ const counter = {
   },
 };
 
-console.log(counter.next());
-console.log(counter.current());
+console.log(counter.next());    // 1
+console.log(counter.current()); // 1
 
-// 3. prototype method
+
+// ==============================
+// 3️⃣ PROTOTYPE METHOD (ES5 STYLE)
+// ==============================
 
 function Counter2() {
   this.count = 0;
@@ -50,21 +62,30 @@ Counter2.prototype.current = function () {
 };
 
 const counter2 = new Counter2();
-console.log(counter2.next());
-console.log(counter2.current());
+console.log(counter2.next());    // 1
+console.log(counter2.current()); // 1
 
-// 4 penggunaan ibjek argumen
 
-// const concat = (sparator) => {
+// ==============================
+// 4️⃣ ARGUMENTS OBJECT
+// ==============================
+
+// ❌ Arrow function tidak memiliki `arguments`
+// const concat = (separator) => {
 //   let args = Array.prototype.slice.call(arguments, 1);
-//   return args.join(sparator);
+//   return args.join(separator);
 // };
-
 // console.log(concat("-", "a", "b", "c"));
 
-const concat = function (sparator) {
+// ✅ Gunakan function biasa agar bisa akses `arguments`
+const concat = function (separator) {
   let args = Array.prototype.slice.call(arguments, 1);
-  return args.join(sparator);
+  return args.join(separator);
 };
 
-console.log(concat("-", "a", "b", "c"));
+console.log(concat("-", "a", "b", "c")); // Output: a-b-c
+
+
+// ✅ Alternatif modern pakai rest parameter (ES6)
+const concat2 = (separator, ...args) => args.join(separator);
+console.log(concat2("/", "apple", "banana", "cherry")); // apple/banana/cherry
